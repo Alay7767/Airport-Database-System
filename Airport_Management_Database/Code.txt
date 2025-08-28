@@ -1,0 +1,482 @@
+/*** Author: Group Final_Project 25** Hitaxi Jayantilal Kachhadiya** Alay BrijeshKumar Patel** Course: IFT 530** Sql Server version: Microsoft SQL Server 2019** History** Date Created  Comments** 04/27/2025   Assignment: Final Project*/CREATE DATABASE Final_Project_25_AirlineManagementDB-- Create the tables using SQL script you have defined in the Final project-- 1.	Airlines (Base Table)
+
+CREATE TABLE Airlines (
+    AirlineId VARCHAR(100) NOT NULL PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL UNIQUE,
+    Country VARCHAR(100) NOT NULL
+);
+
+-- 2. Airport (Base Table)
+CREATE TABLE Airport (
+    AirportId INT NOT NULL PRIMARY KEY,
+    AirportName VARCHAR(100) NOT NULL,
+    City VARCHAR(50) NOT NULL,
+    State VARCHAR(50) NULL,
+    Country VARCHAR(50) NOT NULL
+);
+
+-- 3. Status (Base Table)
+
+CREATE TABLE Status (
+    StatusID INT NOT NULL PRIMARY KEY,
+    StatusName VARCHAR(30) NOT NULL UNIQUE
+);
+
+-- 4. Terminal (Base Table)
+
+CREATE TABLE Terminal (
+    TerminalID INT NOT NULL PRIMARY KEY,
+    Name VARCHAR(20) NOT NULL UNIQUE,
+    AirportID INT NOT NULL,
+    FOREIGN KEY (AirportID) REFERENCES Airport(AirportId)
+);
+
+-- 5. Gate (Base Table)
+
+CREATE TABLE Gates (
+    GateID INT NOT NULL PRIMARY KEY,
+    TerminalID INT NOT NULL,
+    GateNumber VARCHAR(10) NOT NULL,
+    FOREIGN KEY (TerminalID) REFERENCES Terminal(TerminalID)
+);
+
+-- 6. Flights (Transaction Table)
+
+CREATE TABLE Flights (
+    FlightID INT NOT NULL PRIMARY KEY,
+    AirlineId VARCHAR(100) NOT NULL,
+    DepartureTime DATETIME NOT NULL,
+    ArrivalTime DATETIME NOT NULL,
+    FromGateID INT NOT NULL,
+    ToGatetID INT NOT NULL,
+    StatusID INT NOT NULL,
+    FOREIGN KEY (AirlineId) REFERENCES Airlines(AirlineId),
+    FOREIGN KEY (FromGateID) REFERENCES Gates(GateId),
+    FOREIGN KEY (ToGatetID) REFERENCES Gates(GateId),
+    FOREIGN KEY (StatusID) REFERENCES Status(StatusID)
+);
+
+-- 7. Passanger (Base Table)
+
+CREATE TABLE Passenger (
+    PassportNumber VARCHAR(10) NOT NULL PRIMARY KEY,
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    Email VARCHAR(100) NOT NULL UNIQUE,
+    Phone VARCHAR(15) NULL
+);
+
+-- 8. Booking (Transaction Table)
+
+CREATE TABLE Booking (
+    BookingID INT NOT NULL PRIMARY KEY,
+    PassportNumber VARCHAR(10) NOT NULL,
+    FlightID INT NOT NULL,
+    SeatNumber VARCHAR(3) NOT NULL,
+    BookingDate DATETIME NOT NULL,
+    FOREIGN KEY (PassportNumber) REFERENCES Passenger(PassportNumber),
+    FOREIGN KEY (FlightID) REFERENCES Flights(FlightID)
+);
+
+-- 9. Cancellation (Transaction Table)
+
+CREATE TABLE Cancellation (
+    CancellationID INT NOT NULL PRIMARY KEY,
+    BookingID INT NOT NULL,
+    CancelledBy VARCHAR(20) NOT NULL,
+    CancellationDate DATE NOT NULL,
+    FOREIGN KEY (BookingID) REFERENCES Booking(BookingID)
+);
+
+-- 10. Staff (Base Table)
+
+CREATE TABLE Staff (
+    StaffID INT NOT NULL PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    Role VARCHAR(50) NOT NULL,
+    FlightID INT NULL,
+    FOREIGN KEY (FlightID) REFERENCES Flights(FlightID)
+);
+
+
+-- Populate the table with 10 rows for dimension tables, 20 – 50 rows for transactional tables.
+
+
+-- 1. Airlines
+INSERT INTO Airlines (AirlineId, Name, Country) VALUES
+('A001', 'Emirates', 'Saudi Arabia'),
+('A002', 'Qatar Airlines', 'Qatar'),
+('A003', 'Air India', 'India'),
+('A004', 'American Airlines', 'USA'),
+('A005', 'Japan Airlines', 'Japan'),
+('A006', 'BlueJet', 'USA'),
+('A007', 'Everest Air', 'Nepal'),
+('A008', 'Pacific Breeze', 'Australia'),
+('A009', 'British Airlines', 'UK'),
+('A010', 'DragonFly', 'China');
+
+Select * from Airlines
+
+-- 2. Airport
+INSERT INTO Airport (AirportId, AirportName, City, State, Country) VALUES
+(1, 'JFK International', 'New York', 'NY', 'USA'),
+(2, 'Doha Airport', 'Doha', NULL, 'Qatar'),
+(3, 'Indira Gandhi Airport', 'Delhi', NULL, 'India'),
+(4, 'Dubai International', 'Dubai', 'Dubai', 'Saudi Arabia'),
+(5, 'Tokyo International', 'Tokyo', 'Tokyo', 'Japan'),
+(6, 'LAX Airport', 'Los Angeles', 'CA', 'USA'),
+(7, 'Sydney Airport', 'Sydney', 'NSW', 'Australia'),
+(8, 'Kathmandu Airport', 'Kathmandu', NULL, 'Nepal'),
+(9, 'Beijing Capital', 'Beijing', NULL, 'China'),
+(10, 'Manchester Airport', 'Manchester', NULL, 'UK');
+
+Select * from Airport
+
+-- 3. Status
+INSERT INTO Status (StatusID, StatusName) VALUES
+(1, 'Scheduled'),
+(2, 'Delayed'),
+(3, 'Cancelled'),
+(4, 'Departed'),
+(5, 'Arrived'),
+(6, 'Boarding'),
+(7, 'Gate Change'),
+(8, 'Security Check'),
+(9, 'Last Call'),
+(10, 'Closed');
+
+Select * from Status
+
+-- 4. Terminal
+INSERT INTO Terminal (TerminalID, Name, AirportID) VALUES
+(1, 'T1', 1),
+(2, 'T2', 1),
+(3, 'A', 2),
+(4, 'B', 2),
+(5, 'T3', 3),
+(6, 'T4', 3),
+(7, 'T5', 4),
+(8, 'T6', 4),
+(9, 'Main', 5),
+(10, 'North', 6),
+(11, 'South', 7),
+(12, 'West', 8),
+(13, 'East', 9),
+(14, 'T7', 10);
+
+Select * from Terminal
+
+-- 5. Gates
+
+INSERT INTO Gates (GateID, TerminalID, GateNumber) VALUES
+(1, 1, 'G1'),
+(2, 1, 'G2'),
+(3, 2, 'G3'),
+(4, 3, 'G4'),
+(5, 4, 'G5'),
+(6, 5, 'G6'),
+(7, 6, 'G7'),
+(8, 7, 'G8'),
+(9, 8, 'G9'),
+(10, 9, 'G10'),
+(11, 10, 'G11');
+
+Select * from Gates
+
+-- 6. Flights
+INSERT INTO Flights (FlightID, AirlineId, DepartureTime, ArrivalTime, FromGateID, ToGatetID, StatusID) VALUES
+(1, 'A001', '2025-05-01 08:00:00', '2025-05-01 12:00:00', 1, 4, 1),
+(2, 'A002', '2025-05-01 09:30:00', '2025-05-01 13:30:00', 2, 5, 2),
+(3, 'A003', '2025-05-02 10:00:00', '2025-05-02 14:00:00', 3, 6, 3),
+(4, 'A004', '2025-05-02 11:00:00', '2025-05-02 15:00:00', 4, 7, 4),
+(5, 'A005', '2025-05-03 07:00:00', '2025-05-03 11:00:00', 5, 8, 5),
+(6, 'A006', '2025-05-03 08:30:00', '2025-05-03 12:30:00', 6, 9, 1),
+(7, 'A007', '2025-05-04 06:00:00', '2025-05-04 10:00:00', 7, 10, 1),
+(8, 'A008', '2025-05-04 13:00:00', '2025-05-04 17:00:00', 8, 1, 2),
+(9, 'A009', '2025-05-05 09:00:00', '2025-05-05 13:00:00', 9, 2, 4),
+(10, 'A010', '2025-05-05 15:00:00', '2025-05-05 19:00:00', 10, 3, 5),
+(11, 'A001', '2025-05-06 08:00:00', '2025-05-06 12:00:00', 1, 4, 1),
+(12, 'A002', '2025-05-06 09:30:00', '2025-05-06 13:30:00', 2, 5, 2),
+(13, 'A003', '2025-05-07 10:00:00', '2025-05-07 14:00:00', 3, 6, 3),
+(14, 'A004', '2025-05-07 11:00:00', '2025-05-07 15:00:00', 4, 7, 4),
+(15, 'A005', '2025-05-08 07:00:00', '2025-05-08 11:00:00', 5, 8, 5),
+(16, 'A006', '2025-05-08 08:30:00', '2025-05-08 12:30:00', 6, 9, 1),
+(17, 'A007', '2025-05-09 06:00:00', '2025-05-09 10:00:00', 7, 10, 1),
+(18, 'A008', '2025-05-09 13:00:00', '2025-05-09 17:00:00', 8, 1, 2),
+(19, 'A009', '2025-05-10 09:00:00', '2025-05-10 13:00:00', 9, 2, 4),
+(20, 'A010', '2025-05-10 15:00:00', '2025-05-10 19:00:00', 10, 3, 5);
+
+Select * from Flights
+
+-- 7. Passenger
+INSERT INTO Passenger (PassportNumber, FirstName, LastName, Email, Phone) VALUES
+('P001', 'Hitaxi', 'Kachhadiya', 'hitaxi@example.com', '1234567890'),
+('P002', 'Alay', 'Patel', 'alay@example.com', '2345678901'),
+('P003', 'Riya', 'Patel', 'riya@example.com', '3456789012'),
+('P004', 'Hasti', 'Lee', 'hasti@example.com', '4567890123'),
+('P005', 'Darshit', 'Mangroliya', 'mangroliya@example.com', '5678901234'),
+('P006', 'Krutali', 'Thakkar', 'krutali@example.com', '6789012345'),
+('P007', 'Samarth', 'Tanaka', 'samarth.t@example.com', '7890123456'),
+('P008', 'Shyam', 'Shah', 'shyam@example.com', '8901234567'),
+('P009', 'Emily', 'paris', 'emily@example.com', '9012345678'),
+('P010', 'shark', 'tank', 'shark@example.com', '0123456789');
+
+Select * from Passenger
+
+-- 8. Booking
+INSERT INTO Booking (BookingID, PassportNumber, FlightID, BookingDate, SeatNumber) VALUES
+(1, 'P001', 1, '2025-04-25', '12A'),
+(2, 'P002', 2, '2025-04-26', '14B'),
+(3, 'P003', 3, '2025-04-27', '15C'),
+(4, 'P004', 4, '2025-04-27', '16D'),
+(5, 'P005', 5, '2025-04-27', '17E'),
+(6, 'P006', 6, '2025-04-28', '18F'),
+(7, 'P007', 7, '2025-04-28', '19A'),
+(8, 'P008', 8, '2025-04-28', '20B'),
+(9, 'P009', 9, '2025-04-28', '21C'),
+(10, 'P001', 10, '2025-04-28', '22D'),
+(11, 'P002', 11, '2025-04-29', '23E'),
+(12, 'P003', 12, '2025-04-29', '24F'),
+(13, 'P004', 13, '2025-04-29', '25A'),
+(14, 'P004', 14, '2025-04-29', '26B'),
+(15, 'P005', 15, '2025-04-29', '27C'),
+(16, 'P006', 16, '2025-04-30', '28D'),
+(17, 'P007', 17, '2025-04-30', '29E'),
+(18, 'P008', 18, '2025-04-30', '30F'),
+(19, 'P009', 19, '2025-04-30', '31A'),
+(20, 'P010', 20, '2025-04-30', '32B'),
+(31, 'P006', 1, '2025-05-03', '43A'),
+(32, 'P007', 2, '2025-05-03', '44B'),
+(33, 'P008', 3, '2025-05-03', '45C'),
+(34, 'P009', 4, '2025-05-03', '46D'),
+(35, 'P010', 5, '2025-05-03', '47E');
+
+Select * from Booking
+
+-- 9. Cancellation
+INSERT INTO Cancellation (CancellationID, BookingID, CancelledBy, CancellationDate) VALUES
+(1, 1, 'Passenger', '2025-04-26'),
+(2, 2, 'Staff', '2025-04-26'),
+(3, 3, 'Passenger', '2025-04-27'),
+(4, 5, 'Staff', '2025-04-28'),
+(5, 6, 'Passenger', '2025-04-28'),
+(6, 7, 'Staff', '2025-04-29'),
+(7, 8, 'Passenger', '2025-04-29'),
+(8, 10, 'Staff', '2025-04-29'),
+(9, 11, 'Passenger', '2025-04-30'),
+(10, 12, 'Passenger', '2025-04-30'),
+(11, 13, 'Staff', '2025-05-01'),
+(12, 14, 'Passenger', '2025-05-01'),
+(13, 15, 'Passenger', '2025-05-01'),
+(14, 16, 'Staff', '2025-05-01'),
+(15, 17, 'Passenger', '2025-05-02'),
+(16, 18, 'Passenger', '2025-05-02'),
+(17, 19, 'Staff', '2025-05-02'),
+(18, 20, 'Passenger', '2025-05-02'),
+(19, 31, 'Staff', '2025-05-04'),
+(20, 32, 'Passenger', '2025-05-04');
+
+Select * from Cancellation
+
+-- 10. Staff
+INSERT INTO Staff (StaffID, Name, Role, FlightID) VALUES
+(1, 'Jayanti Kachhadiya', 'Pilot', 1),
+(2, 'Brijesh Patel', 'Co-Pilot', 1),
+(3, 'Dhwani Antala', 'Flight Attendant', 5),
+(4, 'Rohit Shah', 'Ground Staff', 6),
+(5, 'Dhawal Ghinaiya', 'Security', 8),
+(6, 'Mira Sharma', 'Flight Attendant', 9),
+(7, 'Mahesh Bajirao', 'Pilot', 10),
+(8, 'Amit Kumar', 'Ground Staff', 3),
+(9, 'Meet Parmar', 'Co-Pilot', 4),
+(10, 'Deep Jala', 'Security', 11);
+
+Select * from Staff
+
+/*Create three queries and convert them into views. Explain why you think would be
+useful to the user. All queries must be joined to one or more tables. Make sure you restrict
+the data by using a where clause for each of the queries. */
+
+-- View 1 to which staff is in which flight
+
+/*The Airport HR and Operations team can check which staff members are working on each flight, making sure that no flight has too few or too many staff.*/
+CREATE VIEW Staff_Assigned_To_Flights AS
+SELECT s.StaffID,
+    s.Name AS StaffName,
+    s.Role,
+    f.FlightID,
+    a.Name AS AirlineName,
+    f.DepartureTime
+FROM Staff s
+INNER JOIN Flights f ON s.FlightID = f.FlightID
+INNER JOIN Airlines a ON f.AirlineId = a.AirlineId;
+
+Select * From Staff_Assigned_To_Flights 
+
+-- View 2 to which flight is departing today
+
+/*It shows all the flights leaving today. This helps terminal managers and airline staff to plan and do their work properly.*/
+CREATE VIEW TodayFlights AS
+SELECT a.Name As Airport,
+    t.Name As Terminal,
+    g.GateNumber,
+    f.FlightID,
+    a.Name AS AirlineName,
+    f.DepartureTime    
+FROM Flights f
+JOIN Airlines a ON f.AirlineId = a.AirlineId
+JOIN Gates g ON f.FromGateID = g.GateID
+JOIN Terminal t ON g.TerminalID = t.TerminalID
+Join Airport aa On t.AirportID = aa.AirportId
+WHERE CAST(f.DepartureTime AS DATE) = CAST(GETDATE() AS DATE);
+
+Select * from TodayFlights
+
+-- View 3 to Recently done bookings
+
+/*It helps airlines and their teams see how customers are booking flights lately, so they can plan special offers or rewards for them.*/
+
+CREATE VIEW RecentBookings AS
+SELECT 
+    b.BookingID,
+    p.FirstName,
+    p.LastName,
+    f.FlightID,
+    b.SeatNumber,
+    b.BookingDate
+FROM Booking b
+JOIN Passenger p ON b.PassportNumber = p.PassportNumber
+JOIN Flights f ON b.FlightID = f.FlightID
+WHERE b.BookingDate >= DATEADD(DAY, -7, GETDATE());
+
+Select * From RecentBookings 
+
+/* Create an audit table for one of the lookup tables and demonstrate data saved to that audit table when data in the original table is inserted, modified, or deleted. Include an additional column in the audit table that will have a datetime field when the data was changed in the original table. Include the script to test all the operations  */
+
+-- Creating Audit table for Airlines
+
+CREATE TABLE AuditAirlines (
+    AuditID INT IDENTITY(1,1) PRIMARY KEY,
+    AirlineId VARCHAR(100),
+    Name VARCHAR(100),
+    Country VARCHAR(100),
+    OperationType VARCHAR(10),
+    OperationDateTime DATETIME DEFAULT GETDATE()
+);
+
+-- Creating Trigger for Entry in AuditAirlines Table when any airline Insert in Table
+
+CREATE TRIGGER InsertAirlineAudit
+ON Airlines
+AFTER INSERT
+AS
+BEGIN
+    INSERT INTO AuditAirlines (AirlineId, Name, Country, OperationType, OperationDateTime)
+    SELECT AirlineId, Name, Country, 'INSERT', GETDATE()
+    FROM inserted;
+END;
+
+-- Creating Trigger for Entry in AuditAirlines Table when any airline Update in Table
+
+CREATE TRIGGER UpdateAirlineAudit
+ON Airlines
+AFTER UPDATE
+AS
+BEGIN
+    INSERT INTO AuditAirlines (AirlineId, Name, Country, OperationType, OperationDateTime)
+    SELECT AirlineId, Name, Country, 'Update', GETDATE()
+    FROM inserted;
+END;
+
+-- Creating Trigger for Entry in AuditAirlines Table when any airline Delete in Table
+
+Create TRIGGER DeleteAirlineAudit
+ON Airlines
+AFTER DELETE
+AS
+BEGIN
+    INSERT INTO AuditAirlines (AirlineId, Name, Country, OperationType, OperationDateTime)
+    SELECT AirlineId, Name, Country, 'Delete', GETDATE()
+    FROM deleted;
+END;
+
+INSERT INTO Airlines (AirlineId, Name, Country)
+VALUES ('A012', 'SouthWest', 'USA');
+
+UPDATE Airlines
+SET Name = 'SouthWest Airways'
+WHERE AirlineId = 'A012';
+
+
+DELETE FROM Airlines
+WHERE AirlineId = 'A012';
+
+Select * from AuditAirlines
+
+/*Demonstrate a use of the one stored procedures and User Defined Function (UDF) for your database. Include create and drop scripts.*/
+
+-- Stored Procedure to Get Flights by Status
+
+
+IF OBJECT_ID('dbo.GetFlightsByStatus') IS NOT NULL
+  DROP PROCEDURE [dbo].[GetFlightsByStatus];
+GO
+CREATE PROC GetFlightsByStatus 
+  @StatusNameVar varchar(10) = '%'
+AS
+BEGIN
+  SELECT f.FlightID, a.Name, f.DepartureTime, f.ArrivalTime, s.StatusName
+    FROM Flights f JOIN Status s ON f.StatusID = s.StatusID
+    JOIN Airlines a ON a.AirlineId = f.AirlineId
+    WHERE s.StatusName LIKE @StatusNameVar;
+END
+GO
+
+EXEC GetFlightsByStatus 'Arrived'
+EXEC GetFlightsByStatus
+
+-- User Defined Function to calculate total seats booked for a specific flight
+
+IF OBJECT_ID('fnGetTotalSeatsBooked') IS NOT NULL
+    DROP FUNCTION [dbo].[fnGetTotalSeatsBooked]
+GO
+CREATE FUNCTION fnGetTotalSeatsBooked(@FlightID INT) 
+    RETURNS int
+BEGIN 
+    DECLARE @TotalSeats INT;
+
+   SELECT @TotalSeats = COUNT(*) 
+    FROM Booking 
+    WHERE FlightID = @FlightID;
+
+    RETURN @TotalSeats;
+END;
+
+SELECT dbo.fnGetTotalSeatsBooked(1) AS TotalSeatsBookedForFlight1;
+
+/*Demonstrate the use of one cursor for your database. Create and drop script for cursor.*/
+
+-- Create Curser for Flight Id with Passenger Name.
+
+DECLARE @FlightID INT;
+DECLARE @BookingID INT;
+DECLARE @PassengerName VARCHAR(100);
+
+DECLARE FlightCursor CURSOR FOR
+SELECT b.FlightID, b.BookingID, p.FirstName +' '+ p.LastName as PassengerName
+FROM Booking b JOIN Passenger p on b.PassportNumber = p.PassportNumber
+WHERE b.FlightID IS NOT NULL;
+
+OPEN FlightCursor;
+
+FETCH NEXT FROM FlightCursor INTO @FlightID, @BookingID, @PassengerName;
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    PRINT 'FlightID: ' + CAST(@FlightID AS VARCHAR(10)) + ', BookingID: ' + CAST(@BookingID AS VARCHAR(10)) + ', Passenger: ' + @PassengerName;
+
+    FETCH NEXT FROM FlightCursor INTO @FlightID, @BookingID, @PassengerName;
+END;
+
+CLOSE FlightCursor;
+DEALLOCATE FlightCursor;
